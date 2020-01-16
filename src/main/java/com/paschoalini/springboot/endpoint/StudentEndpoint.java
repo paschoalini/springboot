@@ -1,24 +1,29 @@
 package com.paschoalini.springboot.endpoint;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.paschoalini.springboot.error.CustomErrorType;
 import com.paschoalini.springboot.models.Student;
 
 @RestController
-@RequestMapping("/student")
+@RequestMapping("/students")
 public class StudentEndpoint {
-	//@Autowired
-	//private DateUtil dateUtil;
+	@GetMapping
+	public ResponseEntity<?> listAll() {
+		return new ResponseEntity<>(Student.studentList, HttpStatus.OK);
+	}
 	
-	@RequestMapping(method = RequestMethod.GET, path="/list")
-	public List<Student> listAll() {
-		// System.out.println(dateUtil.formatLocalDateTimeToDatabaseStyle(LocalDateTime.now()));
-		return asList(new Student("Student #01"), new Student("Student #02"));
+	@GetMapping("/{id}")
+	public ResponseEntity<?> getStudentById(@PathVariable("id") Long id) {
+		int index = Student.studentList.indexOf(new Student(id, null));
+		if(index == -1) {
+			return new ResponseEntity<>(new CustomErrorType("Student not found"), HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(Student.studentList.get(index), HttpStatus.OK);
 	}
 }
