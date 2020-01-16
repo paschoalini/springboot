@@ -1,42 +1,6 @@
 package com.paschoalini.springboot.error;
 
-public class ResourceNotFoundDetails {
-	private String title;
-	private int status;
-	private String detail;
-	private long timestamp;
-	private String developerMessage;
-
-	private ResourceNotFoundDetails(Builder builder) {
-		this.title = builder.title;
-		this.status = builder.status;
-		this.detail = builder.detail;
-		this.timestamp = builder.timestamp;
-		this.developerMessage = builder.developerMessage;
-	}
-	
-	public ResourceNotFoundDetails() {
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public String getDetail() {
-		return detail;
-	}
-
-	public long getTimestamp() {
-		return timestamp;
-	}
-
-	public String getDeveloperMessage() {
-		return developerMessage;
-	}
+public class ResourceNotFoundDetails extends ErrorDetails {
 
 	public static final class Builder {
 		private String title;
@@ -78,7 +42,13 @@ public class ResourceNotFoundDetails {
 		}
 		
 		public ResourceNotFoundDetails build() {
-			return new ResourceNotFoundDetails(this);
+			ResourceNotFoundDetails rnfDetails = new ResourceNotFoundDetails();
+			rnfDetails.setDeveloperMessage(this.developerMessage);
+			rnfDetails.setTitle(this.title);
+			rnfDetails.setDetail(this.detail);
+			rnfDetails.setTimestamp(this.timestamp);
+			rnfDetails.setStatus(this.status);
+			return rnfDetails;
 		}
 	}
 }

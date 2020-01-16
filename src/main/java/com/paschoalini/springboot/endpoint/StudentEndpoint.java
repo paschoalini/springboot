@@ -1,6 +1,7 @@
 package com.paschoalini.springboot.endpoint;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -46,7 +47,7 @@ public class StudentEndpoint {
 	
 	@PostMapping
 	@Transactional(rollbackOn = Exception.class)
-	public ResponseEntity<?> save(@RequestBody Student student) {
+	public ResponseEntity<?> save(@Valid @RequestBody Student student) {
 		return new ResponseEntity<>(studentDAO.save(student), HttpStatus.CREATED);
 	}
 	
