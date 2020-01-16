@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.mapping.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,20 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 		.build();
 		
 		return new ResponseEntity<>(rnfDetails, HttpStatus.NOT_FOUND);
+	}
+	
+	@ExceptionHandler(PropertyReferenceException.class)
+	public ResponseEntity<?> handlePropertyReferenceException(PropertyReferenceException prException) {
+		ErrorDetails eDetails = ErrorDetails.Builder
+		.newBuilder()
+		.timestamp(new Date().getTime())
+		.status(HttpStatus.BAD_REQUEST.value())
+		.title("Property Reference Exception")
+		.detail(prException.getMessage())
+		.developerMessage(prException.getClass().getName())
+		.build();
+		
+		return new ResponseEntity<>(eDetails, HttpStatus.BAD_REQUEST);
 	}
 	
 	@Override
