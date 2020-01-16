@@ -1,5 +1,6 @@
 package com.paschoalini.springboot.endpoint;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,40 +14,48 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.paschoalini.springboot.error.CustomErrorType;
 import com.paschoalini.springboot.models.Student;
+import com.paschoalini.springboot.repository.StudentRepository;
 
 @RestController
 @RequestMapping("/students")
 public class StudentEndpoint {
+	private final StudentRepository studentDAO;
+	
+	@Autowired
+	public StudentEndpoint(StudentRepository studentDAO) {
+		this.studentDAO = studentDAO;
+	}
+	
 	@GetMapping
 	public ResponseEntity<?> listAll() {
-		return new ResponseEntity<>(Student.studentList, HttpStatus.OK);
+		return new ResponseEntity<>(studentDAO.findAll(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getStudentById(@PathVariable("id") Long id) {
-		int index = Student.studentList.indexOf(new Student(id, null));
-		if(index == -1) {
-			return new ResponseEntity<>(new CustomErrorType("Student not found"), HttpStatus.NOT_FOUND);
+		Student student = studentDAO.findById(id).get();
+		
+		if(student == null) {
+			return new ResponseEntity<>(new CustomErrorType("Student not found. ID: " + id), HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<>(Student.studentList.get(index), HttpStatus.OK);
+		
+		return new ResponseEntity<>(student, HttpStatus.OK);
 	}
 	
 	@PostMapping
 	public ResponseEntity<?> save(@RequestBody Student student) {
-		Student.studentList.add(student);
-		return new ResponseEntity<>(student, HttpStatus.CREATED);
+		return new ResponseEntity<>(studentDAO.save(student), HttpStatus.CREATED);
 	}
 	
-	@DeleteMapping
-	public ResponseEntity<?> delete(@RequestBody Student student) {
-		Student.studentList.remove(student);
+	@DeleteMapping("/{id}")
+	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+		studentDAO.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@PutMapping
 	public ResponseEntity<?> update(@RequestBody Student student) {
-		Student.studentList.remove(student); // Remove pelo ID
-		Student.studentList.add(student); // Adiciona completo e alterado
+		studentDAO.save(student);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
