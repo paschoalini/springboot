@@ -24,7 +24,7 @@ import com.paschoalini.springboot.models.Student;
 import com.paschoalini.springboot.repository.StudentRepository;
 
 @RestController
-@RequestMapping("/students")
+@RequestMapping("/v1")
 public class StudentEndpoint {
 	private final StudentRepository studentDAO;
 	
@@ -33,30 +33,30 @@ public class StudentEndpoint {
 		this.studentDAO = studentDAO;
 	}
 	
-	@GetMapping
+	@GetMapping("/protected/students")
 	public ResponseEntity<?> listAll(Pageable pageable) {
 		return new ResponseEntity<>(studentDAO.findAll(pageable), HttpStatus.OK);
 	}
 	
-	@GetMapping("/{id}")
+	@GetMapping("/protected/students/{id}")
 	public ResponseEntity<?> getStudentById(@PathVariable("id") Long id, @AuthenticationPrincipal UserDetails userDetails) {
 		System.out.println("AuthoUsername........ " + userDetails.getUsername());
 		verifyIfStudentExists(id);		
 		return new ResponseEntity<>(studentDAO.findById(id).get(), HttpStatus.OK);
 	}
 	
-	@GetMapping("/findByName/{name}")
+	@GetMapping("/protected/students/findByName/{name}")
 	public ResponseEntity<?> findStudentByName(@PathVariable String name) {
 		return new ResponseEntity<>(studentDAO.findByNameIgnoreCaseContaining(name), HttpStatus.OK);
 	}
 	
-	@PostMapping
+	@PostMapping("/admin/students")
 	@Transactional(rollbackOn = Exception.class)
 	public ResponseEntity<?> save(@Valid @RequestBody Student student) {
 		return new ResponseEntity<>(studentDAO.save(student), HttpStatus.CREATED);
 	}
 	
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/admin/students/{id}")
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
 		verifyIfStudentExists(id);
@@ -64,7 +64,7 @@ public class StudentEndpoint {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
-	@PutMapping
+	@PutMapping("/admin/students")
 	public ResponseEntity<?> update(@RequestBody Student student) {
 		verifyIfStudentExists(student.getId());
 		studentDAO.save(student);

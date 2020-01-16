@@ -18,9 +18,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		/* A API toda será protegida */
 		http.authorizeRequests()
-		.anyRequest().authenticated()
+		.antMatchers("/*/protected/**").hasRole("USER")
+		.antMatchers("/*/admin/**").hasRole("ADMIN")
 		.and()
 		.httpBasic()
 		.and()
