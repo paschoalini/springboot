@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.paschoalini.springboot.error.CustomErrorType;
+import com.paschoalini.springboot.error.ResourceNotFoundException;
 import com.paschoalini.springboot.models.Student;
 import com.paschoalini.springboot.repository.StudentRepository;
 
@@ -33,13 +33,8 @@ public class StudentEndpoint {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<?> getStudentById(@PathVariable("id") Long id) {
-		Student student = studentDAO.findById(id).get();
-		
-		if(student == null) {
-			return new ResponseEntity<>(new CustomErrorType("Student not found. ID: " + id), HttpStatus.NOT_FOUND);
-		}
-		
-		return new ResponseEntity<>(student, HttpStatus.OK);
+		verifyIfStudentExists(id);		
+		return new ResponseEntity<>(studentDAO.findById(id).get(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/findByName/{name}")
@@ -54,13 +49,21 @@ public class StudentEndpoint {
 	
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+		verifyIfStudentExists(id);
 		studentDAO.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@PutMapping
 	public ResponseEntity<?> update(@RequestBody Student student) {
+		verifyIfStudentExists(student.getId());
 		studentDAO.save(student);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	private void verifyIfStudentExists(Long id) {		
+		if(!studentDAO.existsById(id)) {
+			throw new ResourceNotFoundException("Student not found. ID: " + id);
+		}
 	}
 }
