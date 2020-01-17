@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
+import org.junit.Before;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.BDDMockito;
@@ -19,6 +20,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -47,8 +49,14 @@ public class StudentEndpointTeste {
 	static class Config {
 		@Bean
 		public RestTemplateBuilder restTemplateBuilder() {
-			return new RestTemplateBuilder().basicAuthentication("glauber@gmail.com", "usuario");
+			return new RestTemplateBuilder().basicAuthentication("paschoalini@gmail.com", "administrador");
 		}
+	}
+	
+	@Before
+	public void setup() {
+		Student student = new Student(1L, "Legolas", "legolas@lordoftherings.com");
+		BDDMockito.when(studentRepository.findById(1L)).thenReturn(Optional.of(student));
 	}
 	
 	@Test
@@ -80,8 +88,6 @@ public class StudentEndpointTeste {
 	// Não funcionou por conta do Optional. Verificar como corrigir
 	@Test
 	public void getStudentByIdWhenUsernameAndPasswordAreCorrectedShouldReturnStatusCode200() {
-		Student student = new Student(1L, "Legolas", "legolas@lordoftherings.com");
-		BDDMockito.when(studentRepository.findById(1L)).thenReturn(Optional.of(student));
 		ResponseEntity<Student> response = restTemplate.getForEntity("/v1/protected/students/1", Student.class);
 		Assertions.assertThat(response.getStatusCodeValue()).isEqualTo(200);
 	}
@@ -90,5 +96,13 @@ public class StudentEndpointTeste {
 	public void getStudentByIdWhenUsernameAndPasswordAndStudentDoesNotExistsAreCorrectedShouldReturnStatusCode404() {
 		ResponseEntity<Student> response = restTemplate.getForEntity("/v1/protected/students/{id}", Student.class, -1);
 		Assertions.assertThat(response.getStatusCodeValue()).isEqualTo(404);
+	}
+	
+	@Test
+	public void deleteWhenUserHasRoleAdminAndStudentExistshoudReturnStatusCode200() {
+		Student student = new Student(1L, "Legolas", "legolas@lordoftherings.com");
+		BDDMockito.doNothing().when(studentRepository).deleteById(1L);
+		ResponseEntity<String> exchange = restTemplate.exchange("/v1/admin/students/{id}", HttpMethod.DELETE, null, String.class, 1L);
+		Assertions.assertThat(exchange.getStatusCodeValue()).isEqualTo(200);
 	}
 }
