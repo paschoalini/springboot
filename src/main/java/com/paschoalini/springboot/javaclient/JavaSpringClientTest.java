@@ -1,14 +1,12 @@
 package com.paschoalini.springboot.javaclient;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import com.paschoalini.springboot.models.PageableResponse;
 import com.paschoalini.springboot.models.Student;
 
 public class JavaSpringClientTest {
@@ -21,6 +19,7 @@ public class JavaSpringClientTest {
 				.basicAuthentication(username, password)
 				.build();
 		
+		/*
 		Student student = restTemplate.getForObject("/{id}", Student.class, 17);
 	
 		System.out.println(student.getId());
@@ -31,7 +30,9 @@ public class JavaSpringClientTest {
 		System.out.println("\nUm único estudante");
 		System.out.println(forEntity);
 		System.out.println(forEntity.getBody());
+		*/
 		
+		/*
 		System.out.println("\nVarios estudantes");
 		Student[] students = restTemplate.getForObject("/", Student[].class);
 		System.out.println(Arrays.toString(students));
@@ -40,5 +41,16 @@ public class JavaSpringClientTest {
 		System.out.println(exchange.getBody());
 		for(Student s : exchange.getBody())
 			System.out.println(s);
+		*/
+		
+		ResponseEntity<PageableResponse<Student>> exchange = 
+				restTemplate.exchange("/?page=1&size=10&sort=id,desc", HttpMethod.GET, null,
+				new ParameterizedTypeReference<PageableResponse<Student>>() {});
+		System.out.println("\n\n===== Listando o conteúdo de exchange");
+		System.out.println(exchange);
+		System.out.println("\n\n===== Listando o conteúdo do body do Response");
+		for(Student s : exchange.getBody())
+			System.out.println(s);
+		
 	}
 }
