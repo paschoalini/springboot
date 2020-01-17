@@ -1,56 +1,24 @@
 package com.paschoalini.springboot.javaclient;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
-
-import com.paschoalini.springboot.models.PageableResponse;
 import com.paschoalini.springboot.models.Student;
 
 public class JavaSpringClientTest {
 	public static void main(String[] args) {
-		String username = "glauber@gmail.com";
-		String password = "usuario";
+		JavaClientDAO bd = new JavaClientDAO();
 		
-		RestTemplate restTemplate = new RestTemplateBuilder()
-				.rootUri("http://localhost:8080/v1/protected/students")
-				.basicAuthentication(username, password)
-				.build();
-		
-		/*
-		Student student = restTemplate.getForObject("/{id}", Student.class, 17);
-	
-		System.out.println(student.getId());
-		System.out.println(student.getName());
-		System.out.println(student.getEmail());
-		
-		ResponseEntity<Student> forEntity = restTemplate.getForEntity("/{id}", Student.class, 17);
-		System.out.println("\nUm único estudante");
-		System.out.println(forEntity);
-		System.out.println(forEntity.getBody());
-		*/
-		
-		/*
-		System.out.println("\nVarios estudantes");
-		Student[] students = restTemplate.getForObject("/", Student[].class);
-		System.out.println(Arrays.toString(students));
-		ResponseEntity<List<Student>> exchange = restTemplate.exchange("/", HttpMethod.GET, null,
-				new ParameterizedTypeReference<List<Student>>() {});
-		System.out.println(exchange.getBody());
-		for(Student s : exchange.getBody())
+		System.out.println("\n\n=====Listando todos estudantes");
+		for(Student s : bd.listAll())
 			System.out.println(s);
-		*/
 		
-		ResponseEntity<PageableResponse<Student>> exchange = 
-				restTemplate.exchange("/?page=1&size=10&sort=id,desc", HttpMethod.GET, null,
-				new ParameterizedTypeReference<PageableResponse<Student>>() {});
-		System.out.println("\n\n===== Listando o conteúdo de exchange");
-		System.out.println(exchange);
-		System.out.println("\n\n===== Listando o conteúdo do body do Response");
-		for(Student s : exchange.getBody())
-			System.out.println(s);
+		System.out.println("\n\n=====Listando UM estudante");
+		System.out.println(bd.findById(23L));
+		
+		
+		System.out.println("Salvando um estudante");
+		Student s = new Student();
+		s.setName("João da Silva");
+		s.setEmail("jsilva@gmail.com");
+		System.out.println(bd.save(s));
 		
 	}
 }
