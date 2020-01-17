@@ -19,8 +19,9 @@ public class Student extends AbstractEntity {
 	public Student() {
 	}
 	
-	public Student(String name) {
+	public Student(String name, String email) {
 		this.name = name;
+		this.email = email;
 	}
 		
 	public String getName() {
