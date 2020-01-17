@@ -23,6 +23,10 @@ import com.paschoalini.springboot.error.ResourceNotFoundException;
 import com.paschoalini.springboot.models.Student;
 import com.paschoalini.springboot.repository.StudentRepository;
 
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping("/v1")
 public class StudentEndpoint {
@@ -34,6 +38,10 @@ public class StudentEndpoint {
 	}
 	
 	@GetMapping("/protected/students")
+	@ApiOperation(value = "Return a list with all students", response = Student[].class)
+	@ApiImplicitParams({
+		@ApiImplicitParam(name = "Authorization", value = "Bearer token", required = true, dataType = "String", paramType = "header")
+	})
 	public ResponseEntity<?> listAll(Pageable pageable) {
 		return new ResponseEntity<>(studentDAO.findAll(pageable), HttpStatus.OK);
 	}
