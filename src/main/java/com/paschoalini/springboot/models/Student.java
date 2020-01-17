@@ -23,6 +23,12 @@ public class Student extends AbstractEntity {
 		this.name = name;
 		this.email = email;
 	}
+	
+	public Student(Long id, String name, String email) {
+		this.setId(id);
+		this.name = name;
+		this.email = email;
+	}
 		
 	public String getName() {
 		return name;
